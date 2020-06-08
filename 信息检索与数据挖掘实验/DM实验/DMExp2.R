@@ -1,0 +1,35 @@
+## term-frequency matrix(task 1)
+library('tm')
+emails <- read.csv('E:\\dataset.csv', header=TRUE, sep=',')
+source <- VectorSource(emails$body)
+corpus <- Corpus(source)
+matrix <- TermDocumentMatrix(corpus, control = list(stopwords=TRUE, removeNumbers=TRUE, removePunctuation=TRUE))
+
+# word cloud visualization and show the 3 words with biggest frequency
+matrix <- as.matrix(matrix)
+freq <- rowSums(matrix)
+stdFreq <- sort(freq, decreasing=TRUE)
+print(stdFreq[1])
+print(stdFreq[2])
+print(stdFreq[3])
+library("wordcloud")
+jpeg(file="E:\\email-wordcloud.jpg")
+wordcloud(names(freq),freq,scale=c(4,.5),min.freq=3,max.words=100,random.order=TRUE, random.color=FALSE, rot.per=.1,colors="black",ordered.colors=FALSE,use.r.layout=FALSE)
+dev.off()
+
+## tf matrix (task 3)
+library(matlab)
+tf <- as.matrix(matrix)
+loc <- find(tf > 0)
+tf[loc] = 1 + log(tf[loc], 10)
+tfFrame <- data.frame(tf)
+write.csv(tfFrame, file="E:\\mail-tf.csv")
+
+## tf-idf matrix (task 4)
+tfidfMat <- as.matrix(matrix)
+loc <- find(tfidfMat > 0)
+tfidfMat[loc] <- 1
+idf <- log(20 / rowSums(tfidfMat), 10)
+tfidf <- tf * tfidfMat
+tfidfFrame <- data.frame(tfidf)
+write.csv(tfidfFrame, file="E:\\mail-tf-idf.csv")
